@@ -1,9 +1,9 @@
 {
   "id": "title-generator",
   "name": "Title Generator",
-  "version": "1.0.3",
-  "minAppVersion": "0.15.0",
-  "description": "Quickly and easily title your notes using OpenAI's GPT-3.5",
+  "version": "1.0.4",
+  "minAppVersion": "0.15.1",
+  "description": "Quickly and easily title your notes using OpenAI's GPT-4o",
   "author": "Jascha Ephraim",
   "authorUrl": "https://jaschaephriam.com",
   "fundingUrl": {

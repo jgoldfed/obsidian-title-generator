@@ -12,6 +12,13 @@ import OpenAI from 'openai';
 import pMap from 'p-map';
 import path from 'path-browserify';
 
+function sanitizeFileName(fileName: string): string {
+  return fileName
+    .replace(/[\\/:*?"<>|]/g, '_') // Replace truly invalid characters with underscores
+    .replace(/^\.+/, '') // Remove leading dots
+    .replace(/\.+$/, '') // Remove trailing dots
+    .trim(); // Trim leading and trailing spaces
+}
 interface TitleGeneratorSettings {
   openAiApiKey: string;
   lowerCaseTitles: boolean;
@@ -70,25 +77,38 @@ export default class TitleGeneratorPlugin extends Plugin {
     loadingStatus.createEl('span', { text: 'Generating title...' });
 
     try {
-      const response = await this.openai.completions.create({
-        model: 'gpt-3.5-turbo-instruct',
-        prompt: `Given the following text:\n###\n${content}\n###\na succint, descriptive title would be: "`,
-        stop: '"',
-        logit_bias: {
-          9: -100,
-          59: -100,
-          14: -100,
-          27: -100,
-          29: -100,
-          25: -100,
-          91: -100,
-          30: -100,
-        },
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a helpful assistant that generates succinct, descriptive titles for given text content. The title should be suitable for use as a file name, and can include spaces, commas, and other common punctuation.',
+          },
+          {
+            role: 'user',
+            content: `Given the following text, please generate a succinct, descriptive title that can be used as a file name (avoid characters that Obsidian will not support like \\ / : * ? " < > |):\n\n${content}`,
+          },
+        ],
+        max_tokens: 50,
       });
-      let title = response.choices[0].text.trim();
+
+      let title = response.choices?.[0]?.message?.content?.trim() || '';
+
+      // Remove quotes if present
+      title = title.replace(/^["']|["']$/g, '');
 
       if (this.settings.lowerCaseTitles) {
         title = title.toLowerCase();
+      }
+
+      // Sanitize the title for use as a file name
+      title = sanitizeFileName(title);
+
+      // Ensure the title is not empty after sanitization
+
+      if (!title) {
+        title = 'untitled';
       }
 
       const currentPath = path.parse(file.path);

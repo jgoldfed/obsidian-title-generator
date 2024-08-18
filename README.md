@@ -1,6 +1,6 @@
 # Title Generator
 
-Quickly and easily title your [Obsidian](https://obsidian.md) notes using [OpenAI's](https://openai.com/) GPT-3.5
+Quickly and easily title your [Obsidian](https://obsidian.md) notes using [OpenAI's](https://openai.com/) GPT-4o
 
 Generate titles for one or multiple notes at a time based on their content.
 
